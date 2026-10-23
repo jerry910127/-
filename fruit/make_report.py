@@ -2,17 +2,39 @@
 import json
 from pathlib import Path
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Image
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
 
+# (字型路徑, ttc 子字型編號)；reportlab 只吃 TrueType 外框，Noto CJK 這類 CFF 字型無法使用。
+FONT_CANDIDATES = [
+    ('C:/Windows/Fonts/msjh.ttc', 0),                                # Windows 微軟正黑體
+    ('/System/Library/Fonts/Supplemental/Arial Unicode.ttf', None),  # macOS
+    ('/Library/Fonts/Arial Unicode.ttf', None),
+    ('/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc', 0),            # Linux／Colab：apt install fonts-wqy-zenhei
+]
+
+
+def register_zh_font():
+    """依序嘗試系統中文字型；都不能用時改用 reportlab 內建的繁中 CID 字型，任何系統都能產生 PDF。"""
+    for path, index in FONT_CANDIDATES:
+        if Path(path).exists():
+            try:
+                pdfmetrics.registerFont(TTFont('ZH', path, **({} if index is None else {'subfontIndex': index})))
+                return 'ZH'
+            except Exception:
+                continue
+    pdfmetrics.registerFont(UnicodeCIDFont('MSung-Light'))
+    return 'MSung-Light'
+
 
 def main():
     root = Path(__file__).resolve().parent
     r = json.loads((root/'result/metrics.json').read_text(encoding='utf-8'))
-    pdfmetrics.registerFont(TTFont('ZH', 'C:/Windows/Fonts/msjh.ttc', subfontIndex=0))
-    body = ParagraphStyle('body', fontName='ZH', fontSize=10, leading=17,
+    font = register_zh_font()
+    body = ParagraphStyle('body', fontName=font, fontSize=10, leading=17,
                           spaceAfter=9, wordWrap='CJK')
     title = ParagraphStyle('title', parent=body, fontSize=22, leading=30,
                            textColor=colors.HexColor('#155e63'), spaceAfter=18)
@@ -29,10 +51,10 @@ def main():
     p('水果影像 CNN 期中專案', title)
     p('程式修改、設計理由與實測報告 | 2026-10-23')
     p('一、如何符合公告', heading)
-    p('依使用者提供的期中專案公告，完成可執行的個人影像分類專案，涵蓋資料處理、模型訓練及結果評估。資料改為 fruit.zip 中的水果影像，不沿用課堂 Fashion-MNIST 或溫度範例資料。任務是辨識蘋果、香蕉、橘子及各自的新鮮／腐爛外觀，共六類。')
-    p('公告另有 Google 試算表登記與第 8 週現場執行、解說程式的要求；這些需學生完成，本程式提供訓練入口、單張照片推論及保存模型，支援現場展示。')
+    p('依期中專案公告，完成可執行的個人影像分類專案，涵蓋資料處理、模型訓練及結果評估。資料改為 fruit.zip 中的水果影像，不沿用課堂 Fashion-MNIST 或溫度範例資料。任務是辨識蘋果、香蕉、橘子及各自的新鮮／腐爛外觀，共六類。')
+    p('第 8 週報告時，現場以保存的最佳模型執行 predict.py 推論單張照片並說明程式碼；需要時也可用 train.py 重新訓練。')
     p('二、原註解與檔案保存方式', heading)
-    p('根目錄既有程式不修改。fruit/original/ 完整保存 legacy/ 中課堂原始 cnn.py、dataset.py、test2.py，包含全部註解；fruit/previous/ 完整保存本次開始時根目錄 LEGO 版本的三個程式。水果版在 fruit/ 建立獨立模組，避免原有雙 main、額外訓練迴圈及不同任務混用。')
+    p('根目錄既有程式不修改。fruit/original/ 完整保存課堂原始 cnn.py、dataset.py、test2.py，包含全部註解；fruit/previous/ 完整保存先前根目錄 LEGO 版本的三個程式。水果版在 fruit/ 建立獨立模組，避免原有雙 main、額外訓練迴圈及不同任務混用。')
     p('三、實際資料稽核', heading)
     m = r['metadata']
     p(f'壓縮檔有 dataset/ 與 dataset/dataset/ 兩套結構。本次僅採 dataset/train/ 與 dataset/test/，共 {m["canonical_entries"]:,} 張候選圖；依原始檔案 SHA-256 排除 {m["duplicates_removed"]:,} 張完全重複圖，跳過 {len(m["skipped"])} 張無法讀取圖，保留 {m["unique_images"]:,} 張。壓縮檔不解壓、不修改，RGB 縮圖載入記憶體供各回合使用。')
@@ -54,7 +76,7 @@ def main():
     p('圖片校正 EXIF 方向、轉 RGB、縮至 64×64，像素轉 0~1 後以 (x-0.5)/0.5 映射到 -1~1。只在訓練時隨機水平翻轉，驗證及測試固定前處理；這裡使用固定尺度，沒有用全體影像估計統計量。CPU 使用四執行緒，固定亂數種子；CUDA 可用時自動選擇 GPU。')
     story.append(PageBreak())
     p('真實訓練與結果評估', title)
-    p(f'本次以完整處理後資料訓練，實際執行 {r["epochs_run"]} 回合，最佳驗證權重在第 {r["best_epoch"]} 回合；裝置 {r["device"]}，包含資料讀取及訓練共 {r["elapsed_seconds"]/60:.1f} 分鐘。使用指令：python fruit/train.py --epochs {r["epochs_run"]}。預設程式最多 15 回合，使用者可另行調整；本報告僅對應本次實測。')
+    p(f'本次以完整處理後資料訓練，實際執行 {r["epochs_run"]} 回合，最佳驗證權重在第 {r["best_epoch"]} 回合；裝置 {r["device"]}，包含資料讀取及訓練共 {r["elapsed_seconds"]/60:.1f} 分鐘。預設最多 15 回合（可用 --epochs 調整），驗證 loss 連續 5 回合未改善即提前停止；本報告數據對應這次實測。')
     table([['指標', '測試結果'], ['Accuracy', f'{r["test_accuracy"]:.2%}'],
         ['Macro F1', f'{r["macro_f1"]:.4f}'], ['多數類別基準 Accuracy', f'{r["majority_baseline_accuracy"]:.2%}'],
         ['Cross entropy', f'{r["test_loss"]:.4f}']], [240, 229])
@@ -72,10 +94,10 @@ def main():
     p('本模型只能在六個既定類別中選一個，未知水果、複雜背景、不同光源與不同相機都可能誤判；softmax 分數不是校準後的正確機率。分類代表外觀標籤，不能作為食品安全或可食用判斷。')
     p('展示與重現', heading)
     p('安裝：python -m pip install -r fruit/requirements.txt<br/>訓練：python fruit/train.py --epochs 15<br/>推論：python fruit/predict.py &quot;你的照片.jpg&quot;<br/>重建 PDF：python fruit/make_report.py')
-    p('本次輸出保存在 fruit/result/；PDF 保存在 fruit/output/pdf/。Git 分支採用先前已建立的 fruit（使用者本次寫為 friut，沿用既有命名）。資料集 ZIP 留在本機，取用資料需自行放回 fruit/fruit.zip。')
+    p('本次輸出保存在 fruit/result/；PDF 保存在 fruit/output/pdf/。資料集 ZIP 檔案過大未上傳 GitHub，重新訓練前需放在 fruit/fruit.zip。')
     dest = root/'output/pdf/fruit_changes_report.pdf'; dest.parent.mkdir(parents=True, exist_ok=True)
     def footer(canvas, doc):
-        canvas.setFont('ZH', 9); canvas.setFillColor(colors.HexColor('#526b6b'))
+        canvas.setFont(font, 9); canvas.setFillColor(colors.HexColor('#526b6b'))
         canvas.drawString(42, 25, '水果 CNN | 修改說明與實測')
         canvas.drawRightString(553, 25, str(doc.page))
     SimpleDocTemplate(str(dest), pagesize=(595, 842), leftMargin=55, rightMargin=55,

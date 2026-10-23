@@ -3,6 +3,7 @@ import argparse
 import copy
 import csv
 import json
+import os
 import random
 import time
 from pathlib import Path
@@ -48,7 +49,9 @@ def main():
         parser.error('epochs/batch-size/lr 必須為正，size 至少 16')
     random.seed(42); np.random.seed(42); torch.manual_seed(42)
     torch.set_num_threads(4)
-    torch.use_deterministic_algorithms(True)
+    # GPU 上部分運算（如 AdaptiveAvgPool 反向傳播）沒有確定性版本：改成只警告，不中斷訓練
+    os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG', ':4096:8')
+    torch.use_deterministic_algorithms(True, warn_only=True)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     out = args.out_dir; out.mkdir(parents=True, exist_ok=True)
     start = time.time()

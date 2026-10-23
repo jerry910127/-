@@ -1,6 +1,6 @@
 # 水果種類與外觀新鮮度 CNN 分類
 
-使用使用者提供的 `fruit.zip`，辨識 freshapples、freshbanana、freshoranges、rottenapples、rottenbanana、rottenoranges 六類。符合公告的資料處理、模型訓練、結果評估流程；不沿用課堂範例資料集。
+使用 Kaggle「Fruits fresh and rotten for classification」資料集（下載後的 `fruit.zip`），辨識 freshapples、freshbanana、freshoranges、rottenapples、rottenbanana、rottenoranges 六類。符合公告的資料處理、模型訓練、結果評估流程；不沿用課堂範例資料集。
 
 ## 執行
 
@@ -19,6 +19,8 @@ python fruit/make_report.py
 
 CNN 三個卷積區塊 (16/32/64 通道)，搭配 BatchNorm、ReLU、Pooling、Dropout。使用 CrossEntropy、Adam、驗證 loss 選最佳模型、5 回合未改善提前停止。預設最多 15 回合，CPU/GPU 自動選擇。輸出 `result/`：最佳權重、資料稽核、分割清單、訓練曲線、混淆矩陣、accuracy、macro F1、逐類 precision/recall/F1 與逐張測試預測。
 
-`original/` 是課堂原始三個 Python 檔案的完整副本（所有註解保留）；`previous/` 是本次開始時根目錄 LEGO 版本的完整副本。根目錄既有程式不改動。新程式用獨立入口，避免舊程式重複 main 與多餘訓練迴圈混入。
+`original/` 是課堂原始三個 Python 檔案的完整副本（所有註解保留）；`previous/` 是先前根目錄 LEGO 版本的完整副本。根目錄既有程式不改動。新程式用獨立入口，避免舊程式重複 main 與多餘訓練迴圈混入。
 
-PDF 位於 `output/pdf/fruit_changes_report.pdf`，說明修改內容、原因與本次實測。模型只判斷資料集定義的外觀類別，不代表食物可安全食用。公告中的 Google 試算表時段登記與現場報告，需由學生自行完成。
+PDF 位於 `output/pdf/fruit_changes_report.pdf`，說明修改內容、原因與本次實測。模型只判斷資料集定義的外觀類別，不代表食物可安全食用。
+
+產生 PDF 會依序尋找 Windows 微軟正黑體、macOS Arial Unicode、Linux 文泉驛正黑（Colab 可先 `apt install fonts-wqy-zenhei`）；都找不到時改用 reportlab 內建中文字型，仍可產生。GPU 上個別運算沒有確定性版本時只會警告、不中斷訓練。

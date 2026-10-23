@@ -23,7 +23,11 @@
 
 完整報告：[fruit/output/pdf/fruit_cnn_report.pdf](fruit/output/pdf/fruit_cnn_report.pdf)
 
-## 在 Colab 執行（建議）
+## 現場 Demo（約 1 分鐘，不需 GPU）
+
+開啟 [colab_demo.ipynb](https://colab.research.google.com/github/jerry910127/-/blob/main/colab_demo.ipynb)：載入已訓練好的模型，預測 `fruit/demo_photos/` 的 24 張照片（Wikimedia Commons 開放授權，來源見其中的 `CREDITS.txt`），可上傳現場照片，並顯示程式碼重點。
+
+## 在 Colab 完整重跑（建議）
 
 開啟 [colab_run.ipynb](https://colab.research.google.com/github/jerry910127/-/blob/main/colab_run.ipynb)，執行階段選 **T4 GPU**，由上往下執行：
 自動下載資料集（免 Kaggle 帳號）→ 訓練與評估 → 上傳照片做 Demo → 產生 PDF → 下載 `fruit_results.zip`。

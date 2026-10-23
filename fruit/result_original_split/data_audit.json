@@ -1,0 +1,34 @@
+{
+  "counts": {
+    "train": {
+      "freshapples": 1439,
+      "freshbanana": 1344,
+      "freshoranges": 1246,
+      "rottenapples": 1991,
+      "rottenbanana": 1890,
+      "rottenoranges": 1356
+    },
+    "val": {
+      "freshapples": 254,
+      "freshbanana": 237,
+      "freshoranges": 220,
+      "rottenapples": 351,
+      "rottenbanana": 334,
+      "rottenoranges": 239
+    },
+    "test": {
+      "freshapples": 395,
+      "freshbanana": 381,
+      "freshoranges": 388,
+      "rottenapples": 601,
+      "rottenbanana": 530,
+      "rottenoranges": 403
+    }
+  },
+  "skipped": [],
+  "canonical_entries": 13599,
+  "unique_images": 13599,
+  "duplicates_removed": 0,
+  "image_size": 64,
+  "limitation": "Exact byte duplicates removed; near-duplicate/augmentation families are not identified. Random validation may be optimistic."
+}

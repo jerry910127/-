@@ -1,0 +1,149 @@
+{
+  "task": "Fruit type and visual freshness classification",
+  "seed": 42,
+  "device": "cuda",
+  "epochs_run": 15,
+  "best_epoch": 15,
+  "test_loss": 0.10466674475580609,
+  "test_accuracy": 0.9603409933283914,
+  "macro_f1": 0.9613296529586287,
+  "majority_baseline_accuracy": 0.22275759822090438,
+  "per_class": [
+    {
+      "class": "freshapples",
+      "precision": 0.891647855530474,
+      "recall": 1.0,
+      "f1": 0.9427207637231504,
+      "support": 395
+    },
+    {
+      "class": "freshbanana",
+      "precision": 1.0,
+      "recall": 0.9763779527559056,
+      "f1": 0.9880478087649402,
+      "support": 381
+    },
+    {
+      "class": "freshoranges",
+      "precision": 0.9689922480620154,
+      "recall": 0.9664948453608248,
+      "f1": 0.9677419354838709,
+      "support": 388
+    },
+    {
+      "class": "rottenapples",
+      "precision": 0.9727272727272728,
+      "recall": 0.8901830282861897,
+      "f1": 0.9296264118158123,
+      "support": 601
+    },
+    {
+      "class": "rottenbanana",
+      "precision": 0.9851024208566108,
+      "recall": 0.9981132075471698,
+      "f1": 0.9915651358950329,
+      "support": 530
+    },
+    {
+      "class": "rottenoranges",
+      "precision": 0.941320293398533,
+      "recall": 0.9553349875930521,
+      "f1": 0.9482758620689655,
+      "support": 403
+    }
+  ],
+  "confusion_matrix": [
+    [
+      395,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      372,
+      0,
+      6,
+      2,
+      0
+    ],
+    [
+      0,
+      0,
+      375,
+      0,
+      0,
+      13
+    ],
+    [
+      46,
+      0,
+      4,
+      535,
+      6,
+      10
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      529,
+      1
+    ],
+    [
+      1,
+      0,
+      8,
+      9,
+      0,
+      385
+    ]
+  ],
+  "metadata": {
+    "counts": {
+      "train": {
+        "freshapples": 1439,
+        "freshbanana": 1344,
+        "freshoranges": 1246,
+        "rottenapples": 1991,
+        "rottenbanana": 1890,
+        "rottenoranges": 1356
+      },
+      "val": {
+        "freshapples": 254,
+        "freshbanana": 237,
+        "freshoranges": 220,
+        "rottenapples": 351,
+        "rottenbanana": 334,
+        "rottenoranges": 239
+      },
+      "test": {
+        "freshapples": 395,
+        "freshbanana": 381,
+        "freshoranges": 388,
+        "rottenapples": 601,
+        "rottenbanana": 530,
+        "rottenoranges": 403
+      }
+    },
+    "skipped": [],
+    "canonical_entries": 13599,
+    "unique_images": 13599,
+    "duplicates_removed": 0,
+    "image_size": 64,
+    "limitation": "Exact byte duplicates removed; near-duplicate/augmentation families are not identified. Random validation may be optimistic."
+  },
+  "params": 25350,
+  "image_size": 64,
+  "environment": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu130",
+    "os": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "cpu": "x86_64",
+    "gpu": "Tesla T4"
+  },
+  "elapsed_seconds": 113.23474931716919
+}

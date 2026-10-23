@@ -12,6 +12,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
 from cnn import CNN
+from dataset import TEST_RATIO, VAL_RATIO
 
 # (字型路徑, ttc 子字型編號)；reportlab 只吃 TrueType 外框，Noto CJK 這類 CFF 字型無法使用。
 FONT_CANDIDATES = [
@@ -82,7 +83,14 @@ def confusion_analysis(r):
     }
 
 
-def update_readme(path, r, ca, params):
+def demo_score(demo):
+    """檔名以類別開頭的 Demo 照片（如 rottenapples_1.jpg）可對答案：回傳 (有標註張數, 完全正確, 新鮮度正確)。"""
+    labeled = [(d['file'].rsplit('_', 1)[0], d['top3'][0][0]) for d in demo or [] if d['file'].rsplit('_', 1)[0] in CLASS_ZH]
+    return (len(labeled), sum(t == p for t, p in labeled),
+            sum(t.startswith('fresh') == p.startswith('fresh') for t, p in labeled))
+
+
+def update_readme(path, r, ca, params, demo=None):
     """改寫 README 中 <!-- results:start --> 與 <!-- results:end --> 之間的結果表。"""
     start, end = '<!-- results:start -->', '<!-- results:end -->'
     if not path.exists():
@@ -91,16 +99,20 @@ def update_readme(path, r, ca, params):
     if start not in text or end not in text:
         return False
     device = (r.get('environment') or {}).get('gpu') or r['device'].upper()
-    block = '\n'.join([
-        '| 指標 | 數值 |', '|---|---|',
+    m = r['metadata']
+    split_row = ([f'| 資料切分 | 按原始照片分組（測試照片洩漏 {m["leak_this_split"]:.0%}） |'] if m.get('split_method') == 'group' else
+                 [f'| 資料切分 | 資料集原始切分（測試照片洩漏 {m["leak_original_split"]:.0%}） |'] if 'leak_original_split' in m else [])
+    n, exact, fresh = demo_score(demo)
+    demo_row = [f'| 外部照片（Demo） | {n} 張中 {exact} 張完全正確、{fresh} 張新鮮度正確 |'] if n else []
+    block = '\n'.join(['| 指標 | 數值 |', '|---|---|'] + split_row + [
         f'| Test Accuracy | {r["test_accuracy"]:.2%} |',
         f'| Macro F1 | {r["macro_f1"]:.4f} |',
         f'| 新鮮 / 腐爛 二分準確率 | {ca["binary_acc"]:.2%} |',
         f'| 多數類別基準 Accuracy | {r["majority_baseline_accuracy"]:.2%} |',
         f'| 模型參數量 | {params:,} |',
         f'| 訓練 | {r["epochs_run"]} 回合（最佳第 {r["best_epoch"]} 回合），{device} 約 {r["elapsed_seconds"]/60:.1f} 分鐘 |',
-    ])
-    new = text[:text.index(start)+len(start)] + '\n' + block + '\n' + text[text.index(end):]
+    ] + demo_row)
+    new =text[:text.index(start)+len(start)] + '\n' + block + '\n' + text[text.index(end):]
     path.write_text(new, encoding='utf-8')
     return True
 
@@ -111,10 +123,14 @@ def main():
     r = json.loads((res/'metrics.json').read_text(encoding='utf-8'))
     eda = json.loads((res/'eda_stats.json').read_text(encoding='utf-8')) if (res/'eda_stats.json').exists() else None
     demo = json.loads((res/'demo_predictions.json').read_text(encoding='utf-8')) if (res/'demo_predictions.json').exists() else None
+    orig_path = root/'result_original_split/metrics.json'
+    orig = json.loads(orig_path.read_text(encoding='utf-8')) if orig_path.exists() else None
     size = r.get('image_size') or r['metadata']['image_size']
     arch_rows, params = model_rows(len(r['per_class']), size)
     ca = confusion_analysis(r)
     zh = lambda c: f'{CLASS_ZH.get(c, c)}（{c}）'
+    m = r['metadata']
+    grouped = m.get('split_method') == 'group'
 
     font = register_zh_font()
     body = ParagraphStyle('body', fontName=font, fontSize=10, leading=17,
@@ -158,7 +174,6 @@ def main():
     # ---------- 資料 ----------
     story.append(PageBreak())
     p('四、資料集與資料探索（EDA）', heading)
-    m = r['metadata']
     p(f'壓縮檔有 dataset/ 與 dataset/dataset/ 兩套結構。本次僅採 dataset/train/ 與 dataset/test/，共 {m["canonical_entries"]:,} 張候選圖；依原始檔案 SHA-256 排除 {m["duplicates_removed"]:,} 張完全重複圖，跳過 {len(m["skipped"])} 張無法讀取圖，保留 {m["unique_images"]:,} 張。壓縮檔不解壓、不修改，RGB 縮圖載入記憶體供各回合使用。')
     rows = [['類別', '訓練', '驗證', '測試']]
     for c in m['counts']['train']:
@@ -174,13 +189,25 @@ def main():
     img(res/'eda_sizes.png', 230)
     story.append(PageBreak())
     p('各類別範例', heading)
-    img(res/'eda_samples.png', 420, 640)
+    img(res/'eda_samples.png', 420, 500 if 'source_photos' in m else 640)
+    if 'source_photos' in m:
+        p('資料洩漏檢查', heading)
+        aug = '、'.join(f'{k} {v:,}' for k, v in sorted(m['augmentation_types'].items(), key=lambda kv: -kv[1]))
+        p(f'檢查檔名發現，資料集作者已先做過離線增強：{m["unique_images"]:,} 張圖其實只來自 {m["source_photos"]:,} 張原始照片，'
+          f'每張照片另有旋轉、平移、椒鹽雜訊、垂直翻轉等變體（{aug}）。若沿用資料集原本的 train / test，'
+          f'<b>測試圖中有 {m["leak_original_split"]:.1%} 的原始照片也出現在訓練或驗證資料裡</b>，模型等於在考看過的照片，準確率會被高估。')
+        p(f'因此本專案改為「按原始照片分組切分」：逐類把原始照片隨機分成測試 {TEST_RATIO:.0%}、其餘的 {VAL_RATIO:.0%} 作驗證，'
+          f'同一張照片的所有變體只會落在同一組，本次測試圖的洩漏比例為 {m["leak_this_split"]:.1%}。' if grouped else
+          '本次結果沿用原始切分，僅作為對照組。')
+
+    split_txt = ('依檔名找出同一張原始照片的所有增強變體，按原始照片逐類分組切分（測試 20%、其餘 15% 驗證，種子 42），避免同一張照片跨組造成洩漏。'
+                 if grouped else '保留原 test，只從 train 逐類抽 15% 作驗證，種子 42。')
 
     # ---------- 方法 ----------
     story.append(PageBreak())
     p('五、程式設計與理由', heading)
     table([['檔案', '修改與設計理由'],
-        ['dataset.py', '由 ZIP 讀取六類影像；捨棄重複資料夾，移除完全相同內容。保留原 test，只從 train 逐類抽 15% 作驗證，種子 42。輸出 manifest 與稽核 JSON，讓每張圖的去向可追查。'],
+        ['dataset.py', f'由 ZIP 讀取六類影像；捨棄重複資料夾，移除完全相同內容。{split_txt}輸出 manifest 與稽核 JSON，讓每張圖的去向可追查。'],
         ['eda.py', '畫出各類別張數、每類範例原圖與原始尺寸分布，作為前處理決策的依據。'],
         ['cnn.py', f'影像輸入改為 RGB 三通道 {size}×{size}；三組 16/32/64 通道卷積搭配 BatchNorm、ReLU 與池化。用自適應池化取代固定 28×28 尺寸假設，Dropout 0.3 降低過擬合，輸出六類 logits。'],
         ['train.py', '單一入口完成讀取、訓練、驗證與最終測試。CrossEntropy 直接接 logits，Adam 學習率 0.001、weight decay 0.0001。僅依驗證 loss 保存最佳權重，連續五回合未改善即停止，避免測試集參與調參。'],
@@ -214,6 +241,25 @@ def main():
           [[zh(v['class']), f'{v["precision"]:.3f}', f'{v["recall"]:.3f}', f'{v["f1"]:.3f}', v['support']] for v in r['per_class']], [185, 75, 75, 75, 75])
     story.append(Spacer(1, 14))
     img(res/'learning_curves.png')
+    if grouped and orig:
+        oca = confusion_analysis(orig)
+        diff = (r['test_accuracy'] - orig['test_accuracy']) * 100
+        story.append(PageBreak())
+        p('切分方式比較：修正資料洩漏前後', heading)
+        p('同一個模型與訓練設定，只改變 train / val / test 的切分方式：')
+        table([['', '原始切分（有洩漏）', '按原始照片分組（本次）'],
+               ['測試圖的原始照片也在訓練資料', f'{m["leak_original_split"]:.1%}', f'{m["leak_this_split"]:.1%}'],
+               ['測試張數', f'{oca["total"]:,}', f'{ca["total"]:,}'],
+               ['Test Accuracy', f'{orig["test_accuracy"]:.2%}', f'{r["test_accuracy"]:.2%}'],
+               ['Macro F1', f'{orig["macro_f1"]:.4f}', f'{r["macro_f1"]:.4f}'],
+               ['新鮮 / 腐爛 二分準確率', f'{oca["binary_acc"]:.2%}', f'{ca["binary_acc"]:.2%}']], [185, 150, 150])
+        p(f'改成分組切分後，accuracy 由 {orig["test_accuracy"]:.2%} 變為 {r["test_accuracy"]:.2%}（{diff:+.2f} 個百分點）。' +
+          ('兩者差距明顯，表示原本的高分有一部分來自「認得看過的照片」；分組切分的結果才代表模型對沒看過的照片的實際能力。'
+           if diff <= -1 else
+           '兩者差距不大，表示模型主要學到可推廣的外觀特徵，而不是記住特定照片。'))
+        if (root/'result_original_split/misclassified.png').exists():
+            p('下圖是原始切分下分錯的測試圖：同一張照片的旋轉、平移版本重複出現，正是洩漏的證據。')
+            img(root/'result_original_split/misclassified.png', 400, 400)
 
     # ---------- 混淆分析 ----------
     story.append(PageBreak())
@@ -238,7 +284,11 @@ def main():
     story.append(PageBreak())
     p('十、Demo：自行拍攝的照片', heading)
     if demo:
-        p(f'以 predict.py 對資料集以外的 {len(demo)} 張照片推論（綠色為預測新鮮、紅色為預測腐爛）：')
+        n, exact, fresh = demo_score(demo)
+        score = (f'其中 {n} 張檔名標有真實類別，{exact} 張完全正確（{exact/n:.0%}）、{fresh} 張新鮮度判斷正確（{fresh/n:.0%}），'
+                 f'明顯低於測試集的 {r["test_accuracy"]:.1%}：資料集多為白底單顆特寫，真實照片的背景、光線、多顆水果或切開的果肉都與訓練資料不同。'
+                 if n else '')
+        p(f'以 predict.py 對資料集以外的 {len(demo)} 張照片推論（綠色為預測新鮮、紅色為預測腐爛）。{score}')
         img(res/'demo_predictions.png', PAGE_WIDTH, 420)
         table([['照片', '預測', '信心度', '第二名']] +
               [[d['file'], zh(d['top3'][0][0]), f'{d["top3"][0][1]:.1%}',
@@ -250,14 +300,26 @@ def main():
     # ---------- 限制與結論 ----------
     story.append(PageBreak())
     p('十一、使用限制', heading)
-    p('SHA-256 只能排除位元完全相同的影像，不能辨識旋轉、裁切或翻轉的近似圖；資料集離線增強來源與拍攝個體沒有可靠群組標籤，因此隨機驗證可能偏樂觀。保留原 test 也不等於保證拍攝來源獨立，建議以另外拍攝的照片測試（見 Demo）。')
+    if grouped:
+        p('SHA-256 排除完全相同的影像，並依檔名把同一張原始照片的增強變體分在同一組，測試集都是模型沒看過的照片。'
+          '但同一批拍攝（相同背景、光線、相機）的不同照片仍可能很相似，資料集也多為白底單顆特寫；換成真實環境的照片，準確率可能明顯下降（見 Demo）。')
+    else:
+        p('SHA-256 只能排除位元完全相同的影像；資料集內含同一張照片的旋轉、平移、雜訊等變體，'
+          f'原始切分下測試圖有 {m.get("leak_original_split", 1):.0%} 的原始照片也在訓練資料中，測試分數會偏樂觀，建議以另外拍攝的照片測試（見 Demo）。')
     p('本模型只能在六個既定類別中選一個，未知水果、複雜背景、不同光源與不同相機都可能誤判；softmax 分數不是校準後的正確機率。分類代表外觀標籤，不能作為食品安全或可食用判斷。')
     p('十二、結論與未來改進', heading)
     concl = [f'以僅 {params:,} 個參數的小型 CNN、{size}×{size} 輸入，在 {ca["total"]:,} 張測試圖上達到 accuracy {r["test_accuracy"]:.2%}、Macro F1 {r["macro_f1"]:.4f}，'
              f'遠高於永遠猜最多類別的基準 {r["majority_baseline_accuracy"]:.2%}；只看新鮮 / 腐爛時準確率為 {ca["binary_acc"]:.2%}。']
+    if grouped and 'leak_original_split' in m:
+        concl.append(f'發現資料集內同一張照片的增強變體橫跨 train / test（原始切分洩漏 {m["leak_original_split"]:.0%}），'
+                     '改為按原始照片分組切分後，測試分數才反映模型對新照片的能力' +
+                     (f'；原始切分的 {orig["test_accuracy"]:.2%} 是被高估的。' if orig else '。'))
     if ca['top']:
         n, t, pr, _ = ca['top'][0]
         concl.append(f'最主要的錯誤是把{zh(t)}判成{zh(pr)}（{n} 張），是下一步最值得改善的地方。')
+    n_demo, exact, _ = demo_score(demo)
+    if n_demo:
+        concl.append(f'外部照片只有 {exact}/{n_demo} 張完全正確，代表模型對真實拍攝環境的泛化能力仍不足。')
     concl.append(stop_txt)
     p('<br/>'.join(f'• {c}' for c in concl))
     p('未來改進：<br/>'
@@ -277,7 +339,7 @@ def main():
     SimpleDocTemplate(str(dest), pagesize=(595, 842), leftMargin=55, rightMargin=55,
         topMargin=42, bottomMargin=45).build(story, onFirstPage=footer, onLaterPages=footer)
     print(dest)
-    if update_readme(root.parent/'README.md', r, ca, params):
+    if update_readme(root.parent/'README.md', r, ca, params, demo):
         print('README 結果表已更新')
 
 

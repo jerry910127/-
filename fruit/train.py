@@ -47,6 +47,8 @@ def main():
     parser.add_argument('--batch-size', type=int, default=64)
     parser.add_argument('--size', type=int, default=64)
     parser.add_argument('--lr', type=float, default=.001)
+    parser.add_argument('--split', choices=['group', 'original'], default='group',
+                        help='group：按原始照片分組切分（預設，避免洩漏）；original：沿用資料集原本的 train/test')
     args = parser.parse_args()
     if args.epochs < 1 or args.batch_size < 1 or args.size < 16 or args.lr <= 0:
         parser.error('epochs/batch-size/lr 必須為正，size 至少 16')
@@ -59,10 +61,12 @@ def main():
     out = args.out_dir; out.mkdir(parents=True, exist_ok=True)
     start = time.time()
     print('Reading fruit ZIP and checking exact duplicates...', flush=True)
-    images, records, metadata = prepare_data(args.archive, args.size)
+    images, records, metadata = prepare_data(args.archive, args.size, split=args.split)
+    print(f"Split={args.split}: {metadata['source_photos']:,} source photos, "
+          f"test leakage {metadata['leak_original_split']:.1%} (original split) -> {metadata['leak_this_split']:.1%} (this run)", flush=True)
     (out/'data_audit.json').write_text(json.dumps(metadata, indent=2), encoding='utf-8')
     with (out/'split_manifest.csv').open('w', newline='', encoding='utf-8-sig') as f:
-        writer = csv.DictWriter(f, fieldnames=['file', 'label', 'split', 'sha256'])
+        writer = csv.DictWriter(f, fieldnames=['file', 'label', 'split', 'sha256', 'source'])
         writer.writeheader(); writer.writerows(records)
     print('Plotting EDA figures...', flush=True)
     plot_eda(args.archive, out, metadata)

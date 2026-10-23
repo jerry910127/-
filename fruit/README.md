@@ -20,7 +20,9 @@ python fruit/make_report.py
 
 將原始 `fruit.zip` 放在本資料夾，不必解壓縮。檔案過大，未提交 GitHub。ZIP 須包含 `dataset/train/<class>/` 與 `dataset/test/<class>/`；重複的 `dataset/dataset/` 完全不讀取。
 
-輸入轉 RGB、縮至 64×64、以 (x-0.5)/0.5 正規化，僅訓練集隨機水平翻轉。原 test 保留作最終測試；從原 train 逐類固定種子抽 15% 作驗證。移除完全相同檔案內容，manifest 記錄切分與 SHA-256。未偵測所有近似圖及離線增強家族，仍可能高估泛化能力。
+輸入轉 RGB、縮至 64×64、以 (x-0.5)/0.5 正規化，僅訓練集隨機水平翻轉。移除完全相同檔案內容，manifest 記錄切分、SHA-256 與原始照片名稱。
+
+**資料切分（避免洩漏）**：資料集的 13,599 張圖其實只來自 1,511 張原始照片，每張另有旋轉、平移、椒鹽雜訊、垂直翻轉等離線增強版本（檔名前綴 `rotated_by_*`、`translation_` 等）。資料集原本的 train / test 中，測試圖的原始照片 100% 也出現在訓練資料裡，測試分數會被高估。因此預設改為**按原始照片分組**逐類切分：20% 原始照片作測試、其餘的 15% 作驗證，同一張照片的所有變體只會在同一組。若要重現原始切分做對照：`python fruit/train.py --split original --out-dir fruit/result_original_split`。`result_original_split/` 保存了原始切分在 Colab T4 上的結果，報告會拿來比較修正前後。
 
 CNN 三個卷積區塊 (16/32/64 通道)，搭配 BatchNorm、ReLU、Pooling、Dropout。使用 CrossEntropy、Adam、驗證 loss 選最佳模型、5 回合未改善提前停止。預設最多 15 回合，CPU/GPU 自動選擇。輸出 `result/`：最佳權重、資料稽核、分割清單、EDA 圖、訓練曲線、混淆矩陣、分錯圖片、accuracy、macro F1、逐類 precision/recall/F1、參數量、執行環境與逐張測試預測（含信心度）。
 

@@ -54,7 +54,7 @@ def main():
     p('依期中專案公告，完成可執行的個人影像分類專案，涵蓋資料處理、模型訓練及結果評估。資料改為 fruit.zip 中的水果影像，不沿用課堂 Fashion-MNIST 或溫度範例資料。任務是辨識蘋果、香蕉、橘子及各自的新鮮／腐爛外觀，共六類。')
     p('第 8 週報告時，現場以保存的最佳模型執行 predict.py 推論單張照片並說明程式碼；需要時也可用 train.py 重新訓練。')
     p('二、原註解與檔案保存方式', heading)
-    p('根目錄既有程式不修改。fruit/original/ 完整保存課堂原始 cnn.py、dataset.py、test2.py，包含全部註解；fruit/previous/ 完整保存先前根目錄 LEGO 版本的三個程式。水果版在 fruit/ 建立獨立模組，避免原有雙 main、額外訓練迴圈及不同任務混用。')
+    p('fruit/original/ 完整保存課堂原始 cnn.py、dataset.py、test2.py，包含全部註解；fruit/previous/ 完整保存先前 LEGO 版本的三個程式與 archive.zip 資料。水果版在 fruit/ 建立獨立模組，避免原有雙 main、額外訓練迴圈及不同任務混用。')
     p('三、實際資料稽核', heading)
     m = r['metadata']
     p(f'壓縮檔有 dataset/ 與 dataset/dataset/ 兩套結構。本次僅採 dataset/train/ 與 dataset/test/，共 {m["canonical_entries"]:,} 張候選圖；依原始檔案 SHA-256 排除 {m["duplicates_removed"]:,} 張完全重複圖，跳過 {len(m["skipped"])} 張無法讀取圖，保留 {m["unique_images"]:,} 張。壓縮檔不解壓、不修改，RGB 縮圖載入記憶體供各回合使用。')

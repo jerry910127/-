@@ -21,7 +21,12 @@
 
 完整報告：[fruit/output/pdf/fruit_cnn_report.pdf](fruit/output/pdf/fruit_cnn_report.pdf)
 
-## 快速開始
+## 在 Colab 執行（建議）
+
+開啟 [colab_run.ipynb](https://colab.research.google.com/github/jerry910127/-/blob/main/colab_run.ipynb)，執行階段選 **T4 GPU**，由上往下執行：
+自動下載資料集（免 Kaggle 帳號）→ 訓練與評估 → 上傳照片做 Demo → 產生 PDF → 下載 `fruit_results.zip`。
+
+## 在本機執行
 
 在本 repo 根目錄執行；`fruit.zip`（Kaggle 下載的資料集）需先放在 `fruit/` 裡：
 

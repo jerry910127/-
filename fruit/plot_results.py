@@ -1,14 +1,41 @@
 """從已保存的結果重建圖表，不必重新訓練。"""
 import csv
+import io
 import json
+import zipfile
 from pathlib import Path
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from PIL import Image, ImageOps
 
 
-def plot_results(out):
+def plot_misclassified(out, archive, n=12):
+    """從 ZIP 讀原圖，畫出測試集分錯的圖片；有信心度時先列「最有把握卻答錯」的。"""
+    out = Path(out)
+    with (out/'test_predictions.csv').open(encoding='utf-8-sig') as f:
+        wrong = [r for r in csv.DictReader(f) if r['actual'] != r['predicted']]
+    if not wrong:
+        return 0
+    if 'confidence' in wrong[0]:
+        wrong.sort(key=lambda r: -float(r['confidence']))
+    show = wrong[:n]
+    cols = 4; rows = (len(show)+cols-1)//cols
+    fig = plt.figure(figsize=(cols*3, rows*3.3))
+    with zipfile.ZipFile(archive) as z:
+        for k, r in enumerate(show):
+            ax = fig.add_subplot(rows, cols, k+1); ax.axis('off')
+            with Image.open(io.BytesIO(z.read(r['file']))) as im:
+                ax.imshow(ImageOps.exif_transpose(im).convert('RGB'))
+            conf = f" ({float(r['confidence']):.2f})" if 'confidence' in r else ''
+            ax.set_title(f"true: {r['actual']}\npred: {r['predicted']}{conf}", fontsize=9, color='#b83232')
+    fig.suptitle(f'Misclassified test images ({len(show)} of {len(wrong)})')
+    fig.tight_layout(); fig.savefig(out/'misclassified.png', dpi=130); plt.close(fig)
+    return len(wrong)
+
+
+def plot_results(out, archive=None):
     out = Path(out)
     r = json.loads((out/'metrics.json').read_text(encoding='utf-8'))
     with (out/'loss.csv').open(encoding='utf-8') as f:
@@ -30,7 +57,10 @@ def plot_results(out):
     for i in range(6):
         for j in range(6): ax.text(j, i, str(cm[i, j]), ha='center', va='center', color='white' if cm[i,j] > cm.max()/2 else 'black')
     fig.tight_layout(); fig.savefig(out/'confusion_matrix.png', dpi=150); plt.close(fig)
+    if archive is not None and Path(archive).exists():
+        plot_misclassified(out, archive)
 
 
 if __name__ == '__main__':
-    plot_results(Path(__file__).resolve().parent/'result')
+    root = Path(__file__).resolve().parent
+    plot_results(root/'result', root/'fruit.zip')

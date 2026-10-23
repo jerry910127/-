@@ -4,6 +4,7 @@ import copy
 import csv
 import json
 import os
+import platform
 import random
 import time
 from pathlib import Path
@@ -12,11 +13,12 @@ import torch
 from torch.utils.data import DataLoader
 from cnn import CNN
 from dataset import CLASSES, FruitDataset, prepare_data
+from eda import plot_eda
 
 
 def run(model, loader, device, optimizer=None):
     model.train(optimizer is not None)
-    total, correct, loss_sum, actual, predicted = 0, 0, 0., [], []
+    total, correct, loss_sum, actual, predicted, confidence = 0, 0, 0., [], [], []
     with torch.set_grad_enabled(optimizer is not None):
         for x, y in loader:
             x, y = x.to(device), y.to(device)
@@ -26,13 +28,14 @@ def run(model, loader, device, optimizer=None):
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-            p = logits.argmax(1)
+            conf, p = logits.softmax(1).max(1)
             total += len(y)
             loss_sum += loss.item()*len(y)
             correct += (p == y).sum().item()
             actual.extend(y.cpu().tolist())
             predicted.extend(p.cpu().tolist())
-    return loss_sum/total, correct/total, actual, predicted
+            confidence.extend(conf.detach().cpu().tolist())
+    return loss_sum/total, correct/total, actual, predicted, confidence
 
 
 def main():
@@ -61,6 +64,8 @@ def main():
     with (out/'split_manifest.csv').open('w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=['file', 'label', 'split', 'sha256'])
         writer.writeheader(); writer.writerows(records)
+    print('Plotting EDA figures...', flush=True)
+    plot_eda(args.archive, out, metadata)
     loaders = {s: DataLoader(FruitDataset(images, records, s), batch_size=args.batch_size,
                   shuffle=s == 'train', num_workers=0,
                   generator=torch.Generator().manual_seed(42)) for s in ('train', 'val', 'test')}
@@ -82,7 +87,7 @@ def main():
         if stale >= 5:
             break
     model.load_state_dict(best_state)
-    loss, acc, actual, predicted = run(model, loaders['test'], device)
+    loss, acc, actual, predicted, confidence = run(model, loaders['test'], device)
     cm = np.zeros((6, 6), dtype=int)
     for y, p in zip(actual, predicted):
         cm[y, p] += 1
@@ -99,18 +104,23 @@ def main():
               'macro_f1': float(np.mean([r['f1'] for r in rows])),
               'majority_baseline_accuracy': actual.count(majority)/len(actual),
               'per_class': rows, 'confusion_matrix': cm.tolist(), 'metadata': metadata,
+              'params': sum(p.numel() for p in model.parameters()), 'image_size': args.size,
+              'environment': {'python': platform.python_version(), 'torch': torch.__version__,
+                              'os': platform.platform(), 'cpu': platform.processor(),
+                              'gpu': torch.cuda.get_device_name(0) if device.type == 'cuda' else None},
               'elapsed_seconds': time.time()-start}
     (out/'metrics.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     with (out/'loss.csv').open('w', newline='', encoding='utf-8') as f:
         w = csv.writer(f); w.writerow(['epoch', 'train_loss', 'val_loss', 'train_acc', 'val_acc']); w.writerows(history)
     with (out/'test_predictions.csv').open('w', newline='', encoding='utf-8-sig') as f:
-        w = csv.writer(f); w.writerow(['file', 'actual', 'predicted'])
-        w.writerows((records[i]['file'], CLASSES[y], CLASSES[p]) for i, y, p in zip(loaders['test'].dataset.ids, actual, predicted))
+        w = csv.writer(f); w.writerow(['file', 'actual', 'predicted', 'confidence'])
+        w.writerows((records[i]['file'], CLASSES[y], CLASSES[p], f'{c:.4f}')
+                    for i, y, p, c in zip(loaders['test'].dataset.ids, actual, predicted, confidence))
     torch.save({'model_state_dict': best_state, 'classes': CLASSES,
                 'image_size': args.size, 'normalization': {'mean': .5, 'std': .5},
                 'best_epoch': best_epoch}, out/'best_cnn.pth')
     from plot_results import plot_results
-    plot_results(out)
+    plot_results(out, args.archive)
     print(json.dumps({k: result[k] for k in ('test_accuracy', 'macro_f1', 'best_epoch', 'elapsed_seconds')}), flush=True)
 
 

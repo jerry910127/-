@@ -4,6 +4,7 @@
 #   python train.py --data_dir <資料夾> --arch resnet18
 import argparse
 import csv
+import json
 import time
 from pathlib import Path
 
@@ -109,10 +110,11 @@ def main():
         val_loss, val_acc = run_epoch(model, val_loader, criterion, device)
         scheduler.step(val_loss)
 
+        sec = time.time() - t0
         log_rows.append(dict(epoch=epoch, train_loss=train_loss, val_loss=val_loss,
-                             train_acc=train_acc, val_acc=val_acc))
+                             train_acc=train_acc, val_acc=val_acc, sec=round(sec, 1)))
         print(f"[Epoch {epoch:02d}] train_loss={train_loss:.4f} val_loss={val_loss:.4f} "
-              f"train_acc={train_acc:.4f} val_acc={val_acc:.4f} ({time.time() - t0:.1f}s)")
+              f"train_acc={train_acc:.4f} val_acc={val_acc:.4f} ({sec:.1f}s)")
 
         if val_loss < best_val_loss:
             best_val_loss, bad_epochs = val_loss, 0
@@ -138,6 +140,12 @@ def main():
         writer.writeheader()
         writer.writerows(log_rows)
     plot_curves(log_rows, out_dir / f"curve_{args.arch}.png", args.arch)
+    # 訓練設定也存下來，報告會用到
+    config = {**vars(args), "img_size": img_size, "lr": lr, "device": str(device),
+              "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+              "torch": torch.__version__}
+    (out_dir / f"config_{args.arch}.json").write_text(
+        json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"訓練完成。最佳 val_loss={best_val_loss:.4f}，紀錄：{log_path}")
 
 

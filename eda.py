@@ -2,6 +2,7 @@
 # 資料探索：各類別張數、每類範例圖、圖片尺寸分布
 # 用法：python eda.py --data_dir <資料夾>
 import argparse
+import json
 import random
 from collections import Counter
 from pathlib import Path
@@ -79,6 +80,17 @@ def main():
     fig.tight_layout()
     fig.savefig(out_dir / "eda_sizes.png", dpi=150)
     plt.close(fig)
+
+    # 數字存成 json，給 make_report.py 使用
+    stats = {
+        "classes": classes,
+        "train": [counts["train"][i] for i in range(len(classes))],
+        "test": [counts["test"][i] for i in range(len(classes))],
+        "width": [min(ws), max(ws)],
+        "height": [min(hs), max(hs)],
+        "size_sample": len(sizes),
+    }
+    (out_dir / "eda_stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[OK] EDA 圖已輸出到 {out_dir.resolve()}")
 
 

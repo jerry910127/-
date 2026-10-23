@@ -3,6 +3,7 @@
 # 在 test set 上評估：Accuracy、classification report、混淆矩陣、分錯的圖片
 import argparse
 import csv
+import json
 from pathlib import Path
 
 import matplotlib
@@ -76,7 +77,7 @@ def main():
 
     # ---- 指標 ----
     acc = accuracy_score(y_true, y_pred)
-    report = classification_report(y_true, y_pred, target_names=class_names, digits=4)
+    report = classification_report(y_true, y_pred, target_names=class_names, digits=4, zero_division=0)
     print(f"\nTest Accuracy: {acc:.4f}  ({len(y_true)} 張)\n")
     print(report)
     (out_dir / f"report_{arch}.txt").write_text(
@@ -93,6 +94,20 @@ def main():
     plt.close(fig)
 
     plot_misclassified(wrong, class_names, out_dir / f"misclassified_{arch}.png")
+
+    # 完整指標存成 json，給 make_report.py 使用
+    report_dict = classification_report(y_true, y_pred, target_names=class_names,
+                                        digits=4, output_dict=True, zero_division=0)
+    metrics = {
+        "arch": arch, "test_acc": acc, "n_test": len(y_true),
+        "macro_f1": report_dict["macro avg"]["f1-score"],
+        "params": count_params(model), "img_size": ckpt["img_size"], "best_epoch": ckpt["epoch"],
+        "class_names": class_names,
+        "per_class": {c: report_dict[c] for c in class_names},
+        "confusion": cm.tolist(),
+    }
+    (out_dir / f"metrics_{arch}.json").write_text(
+        json.dumps(metrics, ensure_ascii=False, indent=2), encoding="utf-8")
 
     # ---- 模型比較表（每評估一個模型就新增 / 更新一列）----
     summary_path = out_dir / "summary.csv"

@@ -13,6 +13,7 @@
 | `train.py` | 訓練：記錄 loss/acc、保存最佳模型、Early stopping、學習率遞減 |
 | `evaluate.py` | Test set 評估：Accuracy、classification report、混淆矩陣、分錯的圖片、模型比較表 |
 | `predict.py` | Demo：對任意圖片預測並輸出 Top-3 機率 |
+| `make_report.py` | 把 `result/` 的數據與圖表整理成一份 HTML 結果報告（`result/report.html`） |
 | `utils.py` | 共用函式（亂數種子、載入 checkpoint、反正規化） |
 | `fruit_colab.ipynb` | Colab 一鍵執行與報告用 Notebook |
 
@@ -32,7 +33,12 @@ python train.py    --data_dir <資料夾> --arch resnet18
 python evaluate.py --data_dir <資料夾> --ckpt result/best_cnn.pth
 python evaluate.py --data_dir <資料夾> --ckpt result/best_resnet18.pth
 python predict.py  --ckpt result/best_resnet18.pth my_photo.jpg
+python make_report.py --author "姓名 學號"
 ```
+
+報告 `result/report.html` 是單一檔案（圖片已內嵌），用瀏覽器開啟後可「列印 → 另存為 PDF」。
+內容包含：專案概述、EDA、前處理、模型設計、訓練曲線、測試結果（各類指標、混淆矩陣）、錯誤分析、Demo、結論。
+其中的數字與觀察（最佳模型、最難分的類別、最常混淆的類別、是否過擬合）都是從結果自動算出來的。
 
 `<資料夾>` 指向 Kaggle 下載解壓後的位置即可。程式會自動往下層尋找同時包含 `train/`、`test/` 的資料夾。
 

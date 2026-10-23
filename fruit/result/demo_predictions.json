@@ -1,0 +1,444 @@
+[
+  {
+    "file": "1376521.jpg",
+    "top3": [
+      [
+        "freshbanana",
+        0.9946
+      ],
+      [
+        "rottenapples",
+        0.0032
+      ],
+      [
+        "freshoranges",
+        0.0011
+      ]
+    ]
+  },
+  {
+    "file": "freshapples_1.jpg",
+    "top3": [
+      [
+        "rottenapples",
+        0.6548
+      ],
+      [
+        "rottenoranges",
+        0.3449
+      ],
+      [
+        "rottenbanana",
+        0.0001
+      ]
+    ]
+  },
+  {
+    "file": "freshapples_2.jpg",
+    "top3": [
+      [
+        "freshapples",
+        0.9998
+      ],
+      [
+        "freshbanana",
+        0.0002
+      ],
+      [
+        "freshoranges",
+        0.0
+      ]
+    ]
+  },
+  {
+    "file": "freshapples_3.jpg",
+    "top3": [
+      [
+        "rottenapples",
+        0.3238
+      ],
+      [
+        "freshapples",
+        0.2212
+      ],
+      [
+        "rottenbanana",
+        0.2181
+      ]
+    ]
+  },
+  {
+    "file": "freshapples_4.jpg",
+    "top3": [
+      [
+        "rottenapples",
+        0.447
+      ],
+      [
+        "rottenbanana",
+        0.2795
+      ],
+      [
+        "rottenoranges",
+        0.1782
+      ]
+    ]
+  },
+  {
+    "file": "freshbanana_1.jpg",
+    "top3": [
+      [
+        "freshbanana",
+        0.9989
+      ],
+      [
+        "rottenbanana",
+        0.0009
+      ],
+      [
+        "rottenoranges",
+        0.0001
+      ]
+    ]
+  },
+  {
+    "file": "freshbanana_2.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        0.9703
+      ],
+      [
+        "freshbanana",
+        0.0292
+      ],
+      [
+        "rottenapples",
+        0.0006
+      ]
+    ]
+  },
+  {
+    "file": "freshbanana_3.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        0.9704
+      ],
+      [
+        "rottenapples",
+        0.0222
+      ],
+      [
+        "freshbanana",
+        0.0066
+      ]
+    ]
+  },
+  {
+    "file": "freshbanana_4.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        0.9913
+      ],
+      [
+        "rottenapples",
+        0.0054
+      ],
+      [
+        "rottenoranges",
+        0.0033
+      ]
+    ]
+  },
+  {
+    "file": "freshoranges_1.jpg",
+    "top3": [
+      [
+        "freshoranges",
+        0.9939
+      ],
+      [
+        "rottenoranges",
+        0.0061
+      ],
+      [
+        "freshbanana",
+        0.0
+      ]
+    ]
+  },
+  {
+    "file": "freshoranges_2.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        0.5811
+      ],
+      [
+        "freshoranges",
+        0.2419
+      ],
+      [
+        "rottenoranges",
+        0.1727
+      ]
+    ]
+  },
+  {
+    "file": "freshoranges_3.jpg",
+    "top3": [
+      [
+        "freshbanana",
+        0.5016
+      ],
+      [
+        "rottenapples",
+        0.257
+      ],
+      [
+        "freshapples",
+        0.2179
+      ]
+    ]
+  },
+  {
+    "file": "freshoranges_4.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        1.0
+      ],
+      [
+        "rottenapples",
+        0.0
+      ],
+      [
+        "freshbanana",
+        0.0
+      ]
+    ]
+  },
+  {
+    "file": "images.jpg",
+    "top3": [
+      [
+        "freshbanana",
+        0.7605
+      ],
+      [
+        "freshoranges",
+        0.2101
+      ],
+      [
+        "freshapples",
+        0.0294
+      ]
+    ]
+  },
+  {
+    "file": "rottenapples_1.jpg",
+    "top3": [
+      [
+        "freshoranges",
+        0.7206
+      ],
+      [
+        "rottenapples",
+        0.1539
+      ],
+      [
+        "rottenoranges",
+        0.1053
+      ]
+    ]
+  },
+  {
+    "file": "rottenapples_2.jpg",
+    "top3": [
+      [
+        "freshapples",
+        0.7348
+      ],
+      [
+        "freshbanana",
+        0.1282
+      ],
+      [
+        "rottenapples",
+        0.1109
+      ]
+    ]
+  },
+  {
+    "file": "rottenapples_3.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        0.9907
+      ],
+      [
+        "rottenapples",
+        0.0056
+      ],
+      [
+        "rottenoranges",
+        0.0032
+      ]
+    ]
+  },
+  {
+    "file": "rottenapples_4.jpg",
+    "top3": [
+      [
+        "rottenoranges",
+        0.5808
+      ],
+      [
+        "rottenapples",
+        0.2818
+      ],
+      [
+        "rottenbanana",
+        0.1374
+      ]
+    ]
+  },
+  {
+    "file": "rottenbanana_1.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        0.9063
+      ],
+      [
+        "rottenoranges",
+        0.0598
+      ],
+      [
+        "rottenapples",
+        0.0274
+      ]
+    ]
+  },
+  {
+    "file": "rottenbanana_2.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        1.0
+      ],
+      [
+        "freshbanana",
+        0.0
+      ],
+      [
+        "rottenapples",
+        0.0
+      ]
+    ]
+  },
+  {
+    "file": "rottenbanana_3.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        1.0
+      ],
+      [
+        "rottenapples",
+        0.0
+      ],
+      [
+        "freshbanana",
+        0.0
+      ]
+    ]
+  },
+  {
+    "file": "rottenbanana_4.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        0.9965
+      ],
+      [
+        "rottenapples",
+        0.0026
+      ],
+      [
+        "rottenoranges",
+        0.0009
+      ]
+    ]
+  },
+  {
+    "file": "rottenoranges_1.jpg",
+    "top3": [
+      [
+        "rottenoranges",
+        0.9979
+      ],
+      [
+        "rottenapples",
+        0.0015
+      ],
+      [
+        "rottenbanana",
+        0.0003
+      ]
+    ]
+  },
+  {
+    "file": "rottenoranges_2.jpg",
+    "top3": [
+      [
+        "rottenoranges",
+        0.9133
+      ],
+      [
+        "freshbanana",
+        0.0451
+      ],
+      [
+        "rottenbanana",
+        0.0386
+      ]
+    ]
+  },
+  {
+    "file": "rottenoranges_3.jpg",
+    "top3": [
+      [
+        "rottenoranges",
+        0.7084
+      ],
+      [
+        "freshbanana",
+        0.2808
+      ],
+      [
+        "rottenbanana",
+        0.0103
+      ]
+    ]
+  },
+  {
+    "file": "rottenoranges_4.jpg",
+    "top3": [
+      [
+        "rottenbanana",
+        1.0
+      ],
+      [
+        "freshbanana",
+        0.0
+      ],
+      [
+        "rottenoranges",
+        0.0
+      ]
+    ]
+  }
+]

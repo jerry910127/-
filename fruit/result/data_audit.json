@@ -1,28 +1,28 @@
 {
   "counts": {
     "train": {
-      "freshapples": 1439,
-      "freshbanana": 1344,
-      "freshoranges": 1246,
-      "rottenapples": 1991,
-      "rottenbanana": 1890,
-      "rottenoranges": 1356
+      "freshapples": 1422,
+      "freshbanana": 1332,
+      "freshoranges": 1260,
+      "rottenapples": 2007,
+      "rottenbanana": 1872,
+      "rottenoranges": 1359
     },
     "val": {
-      "freshapples": 254,
-      "freshbanana": 237,
-      "freshoranges": 220,
+      "freshapples": 252,
+      "freshbanana": 234,
+      "freshoranges": 225,
       "rottenapples": 351,
-      "rottenbanana": 334,
-      "rottenoranges": 239
+      "rottenbanana": 333,
+      "rottenoranges": 243
     },
     "test": {
-      "freshapples": 395,
-      "freshbanana": 381,
-      "freshoranges": 388,
-      "rottenapples": 601,
-      "rottenbanana": 530,
-      "rottenoranges": 403
+      "freshapples": 414,
+      "freshbanana": 396,
+      "freshoranges": 369,
+      "rottenapples": 585,
+      "rottenbanana": 549,
+      "rottenoranges": 396
     }
   },
   "skipped": [],
@@ -30,5 +30,19 @@
   "unique_images": 13599,
   "duplicates_removed": 0,
   "image_size": 64,
-  "limitation": "Exact byte duplicates removed; near-duplicate/augmentation families are not identified. Random validation may be optimistic."
+  "split_method": "group",
+  "source_photos": 1511,
+  "variants_per_photo": {
+    "9": 1511
+  },
+  "augmentation_types": {
+    "original": 1511,
+    "rotated": 7555,
+    "saltandpepper": 1511,
+    "translation": 1511,
+    "vertical_flip": 1511
+  },
+  "leak_original_split": 1.0,
+  "leak_this_split": 0.0,
+  "limitation": "Augmented variants are grouped by file-name prefix; photos taken in the same session may still look alike."
 }

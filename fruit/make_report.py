@@ -1,4 +1,5 @@
 """讀取真實訓練成果，產生中文期中專案報告 PDF，並同步更新根目錄 README 的結果表。"""
+import io
 import json
 from datetime import date
 from pathlib import Path
@@ -152,9 +153,14 @@ def main():
         if not path.exists():
             p(f'<font color="#b83232">（尚未產生 {path.name}）</font>')
             return
-        w, h = PILImage.open(path).size
+        pic = PILImage.open(path).convert('RGB')
+        w, h = pic.size
         width = min(width, max_height * w / h)
-        story.append(Image(str(path), width=width, height=width * h / w))
+        # 依版面大小縮圖（約 200 dpi）並轉 JPEG，避免 PDF 動輒十幾 MB
+        scale = min(1, width * 200 / 72 / w)
+        pic = pic.resize((max(1, round(w * scale)), max(1, round(h * scale))), PILImage.LANCZOS)
+        buf = io.BytesIO(); pic.save(buf, 'JPEG', quality=88); buf.seek(0)
+        story.append(Image(buf, width=width, height=width * h / w))
 
     # ---------- 封面與動機 ----------
     p('水果新鮮度 CNN 分類', title)
@@ -282,14 +288,22 @@ def main():
     p('下圖為測試集中分錯的圖片，依模型信心度由高到低排列（最有把握卻答錯的排前面），標題為真實類別、預測類別與信心度。')
     img(res/'misclassified.png', PAGE_WIDTH, 560)
     story.append(PageBreak())
-    p('十、Demo：自行拍攝的照片', heading)
+    p('十、Demo：資料集以外的照片', heading)
     if demo:
         n, exact, fresh = demo_score(demo)
         score = (f'其中 {n} 張檔名標有真實類別，{exact} 張完全正確（{exact/n:.0%}）、{fresh} 張新鮮度判斷正確（{fresh/n:.0%}），'
                  f'明顯低於測試集的 {r["test_accuracy"]:.1%}：資料集多為白底單顆特寫，真實照片的背景、光線、多顆水果或切開的果肉都與訓練資料不同。'
                  if n else '')
-        p(f'以 predict.py 對資料集以外的 {len(demo)} 張照片推論（綠色為預測新鮮、紅色為預測腐爛）。{score}')
-        img(res/'demo_predictions.png', PAGE_WIDTH, 420)
+        labeled = [(d['file'].rsplit('_', 1)[0], d['top3'][0][0]) for d in demo if d['file'].rsplit('_', 1)[0] in CLASS_ZH]
+        f2r = sum(t.startswith('fresh') and p_.startswith('rotten') for t, p_ in labeled)
+        r2f = sum(t.startswith('rotten') and p_.startswith('fresh') for t, p_ in labeled)
+        if f2r > r2f:
+            score += f'錯誤多半是把新鮮判成腐爛（{f2r} 張，反方向只有 {r2f} 張），模型遇到陌生背景時傾向判成「腐爛」。'
+        others = len(demo) - n
+        src = ('檔名標有類別的照片取自 Wikimedia Commons 開放授權圖片（作者與授權見 fruit/result/demo_credits.txt）'
+               + (f'，另 {others} 張為自備照片' if others else '') + '。') if (res/'demo_credits.txt').exists() else ''
+        p(f'以 predict.py 對資料集以外的 {len(demo)} 張照片推論（綠色為預測新鮮、紅色為預測腐爛）。{score}{src}')
+        img(res/'demo_predictions.png', PAGE_WIDTH, 560)
         table([['照片', '預測', '信心度', '第二名']] +
               [[d['file'], zh(d['top3'][0][0]), f'{d["top3"][0][1]:.1%}',
                 f'{CLASS_ZH.get(d["top3"][1][0], d["top3"][1][0])} {d["top3"][1][1]:.1%}' if len(d['top3']) > 1 else '']

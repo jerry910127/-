@@ -11,12 +11,14 @@
 <!-- results:start -->
 | 指標 | 數值 |
 |---|---|
-| Test Accuracy | 95.52% |
-| Macro F1 | 0.9543 |
-| 新鮮 / 腐爛 二分準確率 | 96.78% |
-| 多數類別基準 Accuracy | 22.28% |
+| 資料切分 | 按原始照片分組（測試照片洩漏 0%） |
+| Test Accuracy | 91.95% |
+| Macro F1 | 0.9154 |
+| 新鮮 / 腐爛 二分準確率 | 95.64% |
+| 多數類別基準 Accuracy | 21.59% |
 | 模型參數量 | 25,350 |
-| 訓練 | 8 回合（最佳第 8 回合），CPU 約 8.8 分鐘 |
+| 訓練 | 15 回合（最佳第 15 回合），Tesla T4 約 1.9 分鐘 |
+| 外部照片（Demo） | 24 張中 10 張完全正確、14 張新鮮度正確 |
 <!-- results:end -->
 
 完整報告：[fruit/output/pdf/fruit_cnn_report.pdf](fruit/output/pdf/fruit_cnn_report.pdf)

@@ -1,0 +1,16 @@
+{
+  "size_sample": 600,
+  "width": [
+    150,
+    400.0,
+    840
+  ],
+  "height": [
+    126,
+    364.0,
+    518
+  ],
+  "imbalance_ratio": 1.5928571428571427,
+  "largest_class": "rottenapples",
+  "smallest_class": "freshoranges"
+}

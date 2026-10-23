@@ -1,0 +1,124 @@
+水果 Demo 照片來源（Wikimedia Commons，皆為開放授權）
+檔名開頭是真實類別，方便對照模型預測。
+
+freshapples_1.jpg
+  File:Liat Portal for Foodie Disorder - Red Apple (Whole Fruit).jpg
+  作者：HaJunkiyada｜授權：CC BY-SA 4.0
+  https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Red_Apple_(Whole_Fruit).jpg
+
+freshapples_2.jpg
+  File:Fresh ripe apples on a tree (54015357813).jpg
+  作者：AS Photography from Poland｜授權：CC BY 4.0
+  https://commons.wikimedia.org/wiki/File:Fresh_ripe_apples_on_a_tree_(54015357813).jpg
+
+freshbanana_1.jpg
+  File:Banana isolated on white.jpg
+  作者：robin_24｜授權：CC BY 2.0
+  https://commons.wikimedia.org/wiki/File:Banana_isolated_on_white.jpg
+
+freshbanana_2.jpg
+  File:Bunch of bananas on sale.jpg
+  作者：Wilfredor｜授權：CC0
+  https://commons.wikimedia.org/wiki/File:Bunch_of_bananas_on_sale.jpg
+
+freshoranges_1.jpg
+  File:Oranges - whole-halved-segment.jpg
+  作者：Ivar Leidus｜授權：CC BY-SA 4.0
+  https://commons.wikimedia.org/wiki/File:Oranges_-_whole-halved-segment.jpg
+
+freshoranges_2.jpg
+  File:Ambersweet oranges.jpg
+  作者：見原頁｜授權：Public domain
+  https://commons.wikimedia.org/wiki/File:Ambersweet_oranges.jpg
+
+rottenapples_1.jpg
+  File:Rotten Apple 02.jpg
+  作者：Shams948｜授權：CC0
+  https://commons.wikimedia.org/wiki/File:Rotten_Apple_02.jpg
+
+rottenapples_2.jpg
+  File:Rotten Apple 03.jpg
+  作者：Shams948｜授權：CC0
+  https://commons.wikimedia.org/wiki/File:Rotten_Apple_03.jpg
+
+rottenbanana_1.jpg
+  File:Black-banana.JPG
+  作者：TwoWings｜授權：Public domain
+  https://commons.wikimedia.org/wiki/File:Black-banana.JPG
+
+rottenbanana_2.jpg
+  File:Overripe lacatan bananas.jpg
+  作者：Obsidi♠nSoul｜授權：Public domain
+  https://commons.wikimedia.org/wiki/File:Overripe_lacatan_bananas.jpg
+
+rottenoranges_1.jpg
+  File:Penicillium digitatum orange.jpg
+  作者：Medmyco at English Wikipedia｜授權：CC0
+  https://commons.wikimedia.org/wiki/File:Penicillium_digitatum_orange.jpg
+
+rottenoranges_2.jpg
+  File:Taronja florida per P. digitatum.jpg
+  作者：Xavier Dengra｜授權：CC BY-SA 4.0
+  https://commons.wikimedia.org/wiki/File:Taronja_florida_per_P._digitatum.jpg
+
+--- 第二批：生活場景照片（手拿、桌上、市場、落地）---
+
+freshapples_3.jpg
+  File:Hand holding a red and green apple by its stem indoors in a kitchen.jpg
+  作者：Shixart1985｜授權：CC BY 2.0
+  https://commons.wikimedia.org/wiki/File:Hand_holding_a_red_and_green_apple_by_its_stem_indoors_in_a_kitchen.jpg
+
+freshapples_4.jpg
+  File:Apple and hand.jpg
+  作者：Garcia.arnel｜授權：CC BY-SA 4.0
+  https://commons.wikimedia.org/wiki/File:Apple_and_hand.jpg
+
+freshbanana_3.jpg
+  File:Banana in hand.jpg
+  作者：ProjectManhattan｜授權：CC0
+  https://commons.wikimedia.org/wiki/File:Banana_in_hand.jpg
+
+freshbanana_4.jpg
+  File:Banana in hand peeled.jpg
+  作者：ProjectManhattan｜授權：CC BY-SA 3.0
+  https://commons.wikimedia.org/wiki/File:Banana_in_hand_peeled.jpg
+
+freshoranges_3.jpg
+  File:A Citrus fruit on a Table.jpg
+  作者：IM3847｜授權：CC BY-SA 4.0
+  https://commons.wikimedia.org/wiki/File:A_Citrus_fruit_on_a_Table.jpg
+
+freshoranges_4.jpg
+  File:Oranges on a black table.jpg
+  作者：Mattie B from Santa Cruz｜授權：CC BY-SA 2.0
+  https://commons.wikimedia.org/wiki/File:Oranges_on_a_black_table.jpg
+
+rottenapples_3.jpg
+  File:Apple fruit rot disease with insect damage on the ground by baby-bear.org Natalka Ukraine.jpg
+  作者：Natalka Ukraine (baby-bear.org)｜授權：CC BY 4.0
+  https://commons.wikimedia.org/wiki/File:Apple_fruit_rot_disease_with_insect_damage_on_the_ground_by_baby-bear.org_Natalka_Ukraine.jpg
+
+rottenapples_4.jpg
+  File:Monilinia fructigena brown rot on fallen apple in Ukraine by baby-bear.org Natalka Ukraine.jpg
+  作者：Natalka Ukraine (baby-bear.org)｜授權：CC BY 4.0
+  https://commons.wikimedia.org/wiki/File:Monilinia_fructigena_brown_rot_on_fallen_apple_in_Ukraine_by_baby-bear.org_Natalka_Ukraine.jpg
+
+rottenbanana_3.jpg
+  File:Banana- Anthracnose, crown rot and sugarcane bud moth injury.jpg
+  作者：Plant pests and diseases｜授權：CC0
+  https://commons.wikimedia.org/wiki/File:Banana-_Anthracnose,_crown_rot_and_sugarcane_bud_moth_injury.jpg
+
+rottenbanana_4.jpg
+  File:Overripe kitchen bananas.jpg
+  作者：Meltdown reverter｜授權：CC BY-SA 4.0
+  https://commons.wikimedia.org/wiki/File:Overripe_kitchen_bananas.jpg
+
+rottenoranges_3.jpg
+  File:Mouldy Clementine.jpg
+  作者：NotFromUtrecht｜授權：CC BY-SA 3.0
+  https://commons.wikimedia.org/wiki/File:Mouldy_Clementine.jpg
+
+rottenoranges_4.jpg
+  File:Rotten, moldy and decaying oranges.jpg
+  作者：Downtowngal｜授權：Public domain
+  https://commons.wikimedia.org/wiki/File:Rotten,_moldy_and_decaying_oranges.jpg
